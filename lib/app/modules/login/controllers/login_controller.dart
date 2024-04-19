@@ -26,10 +26,14 @@ class LoginController extends GetxController {
   @override
   void onReady() {
     super.onReady();
+
     String status = StorageProvider.read(StorageKey.status);
-    log("status : $status");
-    if (status == 'longged'){
-      Get.offAllNamed(Routes.HOME);
+    String role = StorageProvider.read(StorageKey.role);
+    log("status : $status, role : $role");
+    if (status == 'logged') {
+      if (role == 'PEMINJAM') {
+        Get.offAllNamed(Routes.HOME);
+      }
     }
   }
 
@@ -40,37 +44,42 @@ class LoginController extends GetxController {
 
   login() async {
     loading(true);
-    try{
+    try {
       FocusScope.of(Get.context!).unfocus();
       formKey.currentState?.save();
-      if(formKey.currentState!.validate()){
+      if (formKey.currentState!.validate()) {
         final response = await ApiProvider.instance().post(Endpoint.login,
-            data: dio.FormData.fromMap({
-              "username":usernameController.text.toString(),
-              "password": passwordController.text.toString()
-            }));
-        if (response.statusCode == 200){
+            data: dio.FormData.fromMap(
+                {"username": usernameController.text.toString(),
+                  "password": passwordController.text.toString()}));
+        if (response.statusCode == 200) {
           final ResponseLogin responseLogin = ResponseLogin.fromJson(response.data);
-          await StorageProvider.write(StorageKey.status, "longged");
+          await StorageProvider.write(StorageKey.status, "logged");
+          await StorageProvider.write(StorageKey.role, responseLogin.data!.role!);
           await StorageProvider.write(StorageKey.idUser, responseLogin.data!.id!.toString());
-          Get.offAllNamed(Routes.HOME);
+          await StorageProvider.write(
+              StorageKey.username, usernameController.text.toString());
+          Get.offAllNamed(Routes.HOME); // Navigasi ke halaman home setelah login berhasil
         } else {
-          Get.snackbar("Maaf", "Login Gagal", backgroundColor: Colors.orange);
+          Get.snackbar("Sorry", "Login failed", backgroundColor: Colors.orange);
         }
       }
       loading(false);
-    } on dio.DioException catch (e){
+    } on dio.DioException catch (e) {
       loading(false);
       if (e.response != null) {
         if (e.response?.data != null) {
-          Get.snackbar("Maaf", "${e.response?.data['message']}", backgroundColor: Colors.orange);
+          Get.snackbar("Sorry", "${e.response?.data['message']}",
+              backgroundColor: Colors.orange);
         }
       } else {
-        Get.snackbar("Maaf", e.message ?? "", backgroundColor: Colors.red);
+        Get.snackbar("Sorry", e.message ?? "", backgroundColor: Colors.red);
       }
     } catch (e) {
       loading(false);
       Get.snackbar("Error", e.toString(), backgroundColor: Colors.red);
     }
   }
+
+  void increment() => count.value++;
 }

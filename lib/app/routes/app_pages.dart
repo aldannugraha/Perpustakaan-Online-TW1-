@@ -7,8 +7,12 @@ import '../modules/add_peminjaman/views/add_peminjaman_view.dart';
 import '../modules/baru/baru.dart';
 import '../modules/book/bindings/book_binding.dart';
 import '../modules/book/views/book_view.dart';
+import '../modules/flash_screen/bindings/flash_screen_binding.dart';
+import '../modules/flash_screen/views/flash_screen_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/home1/bindings/home1_binding.dart';
+import '../modules/home1/views/home1_view.dart';
 import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
 import '../modules/peminjaman/bindings/peminjaman_binding.dart';
@@ -62,6 +66,16 @@ class AppPages {
       name: _Paths.ADD_BOOK,
       page: () => const AddBookView(),
       binding: AddBookBinding(),
+    ),
+    GetPage(
+      name: _Paths.HOME1,
+      page: () => const Home1View(),
+      binding: Home1Binding(),
+    ),
+    GetPage(
+      name: _Paths.FLASH_SCREEN,
+      page: () => const FlashScreenView(),
+      binding: FlashScreenBinding(),
     ),
   ];
 }
